@@ -80,6 +80,7 @@ class BRepCheck_ToolSolid  {
     myIsHole=Standard_False;
     myPntTol=Precision::Confusion();
     myPnt.SetCoord(-1.,-1.,-1.);
+		myInitialised = false;
   };
    
   virtual ~BRepCheck_ToolSolid() {
@@ -110,6 +111,11 @@ class BRepCheck_ToolSolid  {
     Standard_Boolean bFlag;
     TopAbs_State aState;
     //
+    if (!myInitialised)
+    {	
+	Init();
+    }	
+
     BRepClass3d_SolidClassifier& aSC=myHSC->SolidClassifier();
     //
     aSC.Perform(aOther.InnerPoint(), aOther.CheckTol());
@@ -148,6 +154,7 @@ class BRepCheck_ToolSolid  {
         break;
       }
     }
+		myInitialised = true;
   };
   //
  protected:
@@ -156,6 +163,7 @@ class BRepCheck_ToolSolid  {
   Standard_Real myPntTol;
   TopoDS_Solid mySolid;
   Handle(BRepCheck_HSC) myHSC;
+	bool myInitialised;
 };
 //
 typedef NCollection_Vector<BRepCheck_ToolSolid>

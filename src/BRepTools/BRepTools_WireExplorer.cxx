@@ -690,11 +690,12 @@ Standard_Real GetNextParamOnPC(const Handle(Geom2d_Curve)& aPC,
 {
   Standard_Real result = ( reverse ) ? fP : lP;
   Standard_Real dP = Abs( lP - fP ) / 1000.; // was / 16.;
+  auto threshold = 1e-10;
   if( reverse )
     {
       Standard_Real startPar = fP;
       Standard_Boolean nextPntOnEdge = Standard_False;
-      while( !nextPntOnEdge && startPar < lP )
+	while (!nextPntOnEdge && startPar < lP && dP > threshold)
 	{
 	  gp_Pnt2d pnt;
 	  startPar += dP;
@@ -719,7 +720,8 @@ Standard_Real GetNextParamOnPC(const Handle(Geom2d_Curve)& aPC,
     {
       Standard_Real startPar = lP;
       Standard_Boolean nextPntOnEdge = Standard_False;
-      while( !nextPntOnEdge && startPar > fP )
+		int loopCount = 0;
+		while (!nextPntOnEdge && startPar > fP && dP > threshold)
 	{
 	  gp_Pnt2d pnt;
 	  startPar -= dP;
