@@ -1,3 +1,5 @@
+NOTE: This is a clone of the official source code of OpenCascade. We do not own this material and any problems and questions should be directed to the official OCCT team at http://www.opencascade.com 
+
 Open CASCADE Technology
 =======================
 
