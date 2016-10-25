@@ -68,17 +68,28 @@ TopoDS_Shape ShapeBuild_ReShape::Apply (const TopoDS_Shape& shape,
     myStatus = ShapeExtend::EncodeStatus ( ShapeExtend_DONE2 );
     return newsh;
   }
+
+  shapes.insert((long long)shape.TShape().get());
   
   // if shape replaced, apply modifications to the result recursively 
   Standard_Boolean aConsLoc = ModeConsiderLocation();
   if ( (aConsLoc && ! newsh.IsPartner (shape)) || 
-      (!aConsLoc &&! newsh.IsSame ( shape )) )
+	  (!aConsLoc &&!newsh.IsSame(shape)) )
   {
-    TopoDS_Shape res = Apply ( newsh, until );
-    myStatus |= ShapeExtend::EncodeStatus ( ShapeExtend_DONE1 );
-    return res;
+	  if (shapes.find((long long)newsh.TShape().get()) == shapes.end())
+	  {
+		  TopoDS_Shape res = Apply(newsh, until);
+		  myStatus |= ShapeExtend::EncodeStatus(ShapeExtend_DONE1);
+		  return res;
+	  }
+	  else
+	  {
+		  //we've been here before.. stop looping to prevent stack overflow
+		  return shape;
+	  }
+   
   }
-
+  
   TopAbs_ShapeEnum st = shape.ShapeType();
   if ( st >= until ) return newsh;    // critere d arret
   if(st == TopAbs_VERTEX || st == TopAbs_SHAPE)
@@ -86,13 +97,12 @@ TopoDS_Shape ShapeBuild_ReShape::Apply (const TopoDS_Shape& shape,
   // define allowed types of components
 
   BRep_Builder B;
-  
+
   TopoDS_Shape result = shape.EmptyCopied();
   TopAbs_Orientation orient = shape.Orientation(); //JR/Hp: or -> orient
   result.Orientation(TopAbs_FORWARD); // protect against INTERNAL or EXTERNAL shapes
   Standard_Boolean modif = Standard_False;
   Standard_Integer locStatus = myStatus;
-  
   // apply recorded modifications to subshapes
   for ( TopoDS_Iterator it(shape,Standard_False); it.More(); it.Next() ) {
     TopoDS_Shape sh = it.Value();
@@ -120,7 +130,6 @@ TopoDS_Shape ShapeBuild_ReShape::Apply (const TopoDS_Shape& shape,
     if ( ! nitems ) locStatus |= ShapeExtend::EncodeStatus ( ShapeExtend_FAIL1 );
   }
   if ( ! modif ) return shape;
-
   // restore Range on edge broken by EmptyCopied()
   if ( st == TopAbs_EDGE ) {
     ShapeBuild_Edge sbe;
@@ -130,6 +139,7 @@ TopoDS_Shape ShapeBuild_ReShape::Apply (const TopoDS_Shape& shape,
     result.Closed (BRep_Tool::IsClosed (result));
   result.Orientation(orient);
   myStatus = locStatus;
+
   Replace ( shape, result );
 
   return result;

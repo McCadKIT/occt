@@ -17,6 +17,7 @@
 #ifndef _ShapeBuild_ReShape_HeaderFile
 #define _ShapeBuild_ReShape_HeaderFile
 
+#include <set>
 #include <Standard.hxx>
 #include <Standard_Type.hxx>
 
@@ -80,7 +81,7 @@ public:
   //! TopoDS_Wire or TopoDS_Compound containing TopoDS_Edges).
   //! If incompatible shape type is encountered, it is ignored
   //! and flag FAIL1 is set in Status.
-  Standard_EXPORT virtual TopoDS_Shape Apply (const TopoDS_Shape& shape, const TopAbs_ShapeEnum until = TopAbs_SHAPE) Standard_OVERRIDE;
+  Standard_EXPORT virtual TopoDS_Shape Apply(const TopoDS_Shape& shape, const TopAbs_ShapeEnum until = TopAbs_SHAPE) Standard_OVERRIDE;
   
   //! Returns a complete substitution status for a shape
   //! 0  : not recorded,   <newsh> = original <shape>
@@ -107,7 +108,7 @@ public:
 
 protected:
 
-
+	std::set<long long> shapes;
 
 
 private:
